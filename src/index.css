@@ -1,0 +1,284 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* TutorGigs App Design System - Educational Platform Theme */
+
+@layer base {
+  :root {
+    /* Educational Blue Theme */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    /* Primary: Educational Green */
+    --primary: 140 80% 35%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 140 80% 30%;
+
+    /* Secondary: Forest Green for Actions */
+    --secondary: 158 70% 40%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-hover: 158 70% 35%;
+
+    /* Success: Green for accepted/positive actions */
+    --success: 140 80% 45%;
+    --success-foreground: 0 0% 100%;
+
+    /* Warning: Orange for pending states */
+    --warning: 35 90% 55%;
+    --warning-foreground: 0 0% 100%;
+
+    /* Error: Red for rejected/negative actions */
+    --error: 0 80% 55%;
+    --error-foreground: 0 0% 100%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 140 80% 35%;
+
+    --radius: 0.75rem;
+
+    /* Typography Scale */
+    --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    
+    /* Mobile Typography */
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+    --text-3xl: 1.875rem;
+    --text-4xl: 2.25rem;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)));
+    --gradient-card: linear-gradient(145deg, hsl(var(--background)), hsl(210 40% 98%));
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    --shadow-card: 0 4px 16px 0 rgb(0 0 0 / 0.08);
+    
+    /* Animations */
+    --transition-base: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    /* Dark Educational Theme */
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 217.2 32.6% 17.5%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 217.2 32.6% 17.5%;
+    --popover-foreground: 210 40% 98%;
+
+    /* Primary: Bright Green for dark mode */
+    --primary: 140 80% 55%;
+    --primary-foreground: 222.2 84% 4.9%;
+    --primary-hover: 140 80% 60%;
+
+    /* Secondary: Bright Forest Green for dark mode */
+    --secondary: 158 70% 50%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --secondary-hover: 158 70% 55%;
+
+    /* Success: Bright Green for dark mode */
+    --success: 140 80% 55%;
+    --success-foreground: 222.2 84% 4.9%;
+
+    /* Warning: Bright Orange for dark mode */
+    --warning: 35 90% 65%;
+    --warning-foreground: 222.2 84% 4.9%;
+
+    /* Error: Bright Red for dark mode */
+    --error: 0 80% 65%;
+    --error-foreground: 222.2 84% 4.9%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 140 80% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    line-height: 1.2;
+  }
+}
+
+@layer components {
+  /* Responsive Typography Classes */
+  .text-display {
+    font-size: var(--text-4xl);
+    font-weight: 700;
+    line-height: 1.1;
+  }
+
+  .text-heading-1 {
+    font-size: var(--text-3xl);
+    font-weight: 600;
+  }
+
+  .text-heading-2 {
+    font-size: var(--text-2xl);
+    font-weight: 600;
+  }
+
+  .text-heading-3 {
+    font-size: var(--text-xl);
+    font-weight: 600;
+  }
+
+  .text-body-large {
+    font-size: var(--text-lg);
+    line-height: 1.6;
+  }
+
+  .text-body {
+    font-size: var(--text-base);
+    line-height: 1.6;
+  }
+
+  .text-body-small {
+    font-size: var(--text-sm);
+    line-height: 1.5;
+  }
+
+  .text-caption {
+    font-size: var(--text-xs);
+    line-height: 1.4;
+  }
+
+  /* Custom Component Classes */
+  .card-elevated {
+    box-shadow: var(--shadow-card);
+    border-radius: var(--radius);
+    transition: var(--transition-base);
+  }
+
+  .card-elevated:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+  }
+
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+
+  .gradient-card {
+    background: var(--gradient-card);
+  }
+
+  /* Status Colors */
+  .status-success {
+    color: hsl(var(--success));
+  }
+
+  .status-warning {
+    color: hsl(var(--warning));
+  }
+
+  .status-error {
+    color: hsl(var(--error));
+  }
+
+  .bg-success {
+    background-color: hsl(var(--success));
+    color: hsl(var(--success-foreground));
+  }
+
+  .bg-warning {
+    background-color: hsl(var(--warning));
+    color: hsl(var(--warning-foreground));
+  }
+
+  .bg-error {
+    background-color: hsl(var(--error));
+    color: hsl(var(--error-foreground));
+  }
+}
+
+/* Responsive Typography Media Queries */
+@media (min-width: 768px) {
+  :root {
+    --text-xs: 0.875rem;
+    --text-sm: 1rem;
+    --text-base: 1.125rem;
+    --text-lg: 1.25rem;
+    --text-xl: 1.5rem;
+    --text-2xl: 1.875rem;
+    --text-3xl: 2.25rem;
+    --text-4xl: 3rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --text-xs: 1rem;
+    --text-sm: 1.125rem;
+    --text-base: 1.25rem;
+    --text-lg: 1.5rem;
+    --text-xl: 1.875rem;
+    --text-2xl: 2.25rem;
+    --text-3xl: 3rem;
+    --text-4xl: 3.75rem;
+  }
+}
