@@ -12,6 +12,8 @@ type EncryptedPasswordPayload = {
 };
 
 let cachedPasswordKey: PasswordKeyResponse | null = null;
+let cacheTimestamp = 0;
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 const base64ToArrayBuffer = (base64: string): ArrayBuffer => {
   const binary = window.atob(base64);
@@ -35,13 +37,20 @@ const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
   return window.btoa(binary);
 };
 
+export const clearPasswordKeyCache = (): void => {
+  cachedPasswordKey = null;
+  cacheTimestamp = 0;
+};
+
 const getPasswordKey = async (): Promise<PasswordKeyResponse> => {
-  if (cachedPasswordKey) {
+  const now = Date.now();
+  if (cachedPasswordKey && now - cacheTimestamp < CACHE_TTL_MS) {
     return cachedPasswordKey;
   }
 
   const { data } = await api.get<PasswordKeyResponse>("/api/auth/password-key");
   cachedPasswordKey = data;
+  cacheTimestamp = now;
   return data;
 };
 

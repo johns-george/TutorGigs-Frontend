@@ -25,7 +25,7 @@ import { Visibility, VisibilityOff, School } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../api';
-import { encryptPassword } from '../authCrypto';
+import { encryptPassword, clearPasswordKeyCache } from '../authCrypto';
 
 
 const Signup: React.FC = () => {
@@ -121,7 +121,13 @@ const handleSubmit = async (e: React.FormEvent) => {
   setError('');
 
   try {
-    const encryptedPasswordPayload = await encryptPassword(formData.password);
+    let encryptedPasswordPayload;
+    try {
+      encryptedPasswordPayload = await encryptPassword(formData.password);
+    } catch (encryptErr) {
+      clearPasswordKeyCache();
+      encryptedPasswordPayload = await encryptPassword(formData.password);
+    }
 
     // Build request object for backend
   const payload = {

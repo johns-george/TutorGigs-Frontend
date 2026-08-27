@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getAccessToken, getRefreshToken, saveAccessToken, clearAuth } from "./tokenUtils";
 
-const DEFAULT_API_URL = "https://final-tutor-app-backend.onrender.com";
+const DEFAULT_API_URL = "http://localhost:8080";
 
 export const getApiUrl = (): string =>
   window.__APP_CONFIG__?.API_URL ||

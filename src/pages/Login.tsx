@@ -17,7 +17,7 @@ import { Visibility, VisibilityOff, School } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../api';
-import { encryptPassword } from '../authCrypto';
+import { encryptPassword, clearPasswordKeyCache } from '../authCrypto';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -39,7 +39,15 @@ const Login = () => {
     setError('');
 
     try {
-      const encryptedPasswordPayload = await encryptPassword(formData.password);
+      let encryptedPasswordPayload;
+      try {
+        encryptedPasswordPayload = await encryptPassword(formData.password);
+      } catch (encryptErr) {
+        // If encryption fails, the cached key may be stale — clear and retry once
+        clearPasswordKeyCache();
+        encryptedPasswordPayload = await encryptPassword(formData.password);
+      }
+
       const { data } = await api.post('/api/auth/login', {
         username: formData.username,
         ...encryptedPasswordPayload,
