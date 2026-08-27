@@ -15,10 +15,9 @@ import {
   Instagram,
   LinkedIn,
   Email,
-  Phone,
   LocationOn,
 } from '@mui/icons-material';
-import ChatList from './ChatList'; 
+import ChatList from './ChatList';
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -137,15 +136,9 @@ const Footer: React.FC = () => {
                 </Typography>
               </Box>
               <Box display="flex" alignItems="center" gap={1}>
-                <Phone color="primary" fontSize="small" />
-                <Typography variant="body2" color="text.secondary">
-                  +1 (555) 123-4567
-                </Typography>
-              </Box>
-              <Box display="flex" alignItems="center" gap={1}>
                 <LocationOn color="primary" fontSize="small" />
                 <Typography variant="body2" color="text.secondary">
-                  San Francisco, CA
+                  Bangalore, India
                 </Typography>
               </Box>
             </Box>

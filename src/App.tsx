@@ -32,6 +32,9 @@ import GroupChat from './pages/GroupChat';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/RestPassword'
 import ForgotUsername from './pages/ForgotUsername';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
+import HelpCenter from './pages/HelpCenter';
 
 const queryClient = new QueryClient();
 
@@ -72,6 +75,9 @@ const App: React.FC = () => {
                 <Route path="/forgot-password" element={<ForgotPassword/>} />
                 <Route path="/reset-password" element={<ResetPassword/>} />
                 <Route path="/forgot-username" element={<ForgotUsername/>} />
+                <Route path="/privacy" element={<PrivacyPolicy />} />
+                <Route path="/terms" element={<TermsOfService />} />
+                <Route path="/help" element={<HelpCenter />} />
                 
                 {/* Student Only */}
                 <Route path="/explorer" element={
