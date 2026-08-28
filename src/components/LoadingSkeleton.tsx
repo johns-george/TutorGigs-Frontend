@@ -86,3 +86,46 @@ export const GigGridSkeleton: React.FC<{ count?: number }> = ({ count = 6 }) => 
     ))}
   </Box>
 );
+
+/** Skeleton for a form page (EditGig, CreateGig) */
+export const FormSkeleton: React.FC = () => (
+  <Box sx={{ maxWidth: 600, mx: 'auto' }}>
+    <Skeleton variant="text" width="40%" height={40} sx={{ mb: 3 }} />
+    <Stack spacing={3}>
+      <Skeleton variant="rounded" width="100%" height={56} />
+      <Skeleton variant="rounded" width="100%" height={56} />
+      <Skeleton variant="rounded" width="100%" height={56} />
+      <Skeleton variant="rounded" width="100%" height={56} />
+      <Skeleton variant="rounded" width="100%" height={120} />
+      <Skeleton variant="rounded" width={140} height={40} />
+    </Stack>
+  </Box>
+);
+
+/** Skeleton for a dashboard page */
+export const DashboardSkeleton: React.FC = () => (
+  <Box>
+    <Skeleton variant="text" width="35%" height={40} sx={{ mb: 3 }} />
+    <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
+      <CardContent sx={{ p: 4 }}>
+        <Box display="flex" alignItems="center" gap={3} mb={4}>
+          <Skeleton variant="circular" width={80} height={80} />
+          <Box>
+            <Skeleton variant="text" width={180} height={36} />
+            <Skeleton variant="text" width={120} height={24} />
+            <Box display="flex" gap={1} mt={1}>
+              <Skeleton variant="rounded" width={60} height={24} />
+              <Skeleton variant="rounded" width={100} height={24} />
+              <Skeleton variant="rounded" width={80} height={24} />
+            </Box>
+          </Box>
+        </Box>
+        <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }} gap={3}>
+          {[...Array(6)].map((_, i) => (
+            <Skeleton key={i} variant="rounded" width="100%" height={56} />
+          ))}
+        </Box>
+      </CardContent>
+    </Card>
+  </Box>
+);

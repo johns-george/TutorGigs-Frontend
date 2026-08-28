@@ -22,6 +22,7 @@ import { FavoriteSharp, Chat, PeopleAlt } from "@mui/icons-material";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import api, { API_URL } from "@/api"; // centralized axios instance with token handling
+import { GigGridSkeleton } from '../components/LoadingSkeleton';
 
 interface Gig {
   id: number;
@@ -41,6 +42,7 @@ const Wishlist: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [wishlistedGigs, setWishlistedGigs] = useState<Gig[]>([]);
+  const [loading, setLoading] = useState(true);
   const [bids, setBids] = useState<Map<number, string>>(new Map());
   const [ratings, setRatings] = useState<Map<string, number>>(new Map());
   const [selectedGig, setSelectedGig] = useState<Gig | null>(null);
@@ -53,6 +55,7 @@ const Wishlist: React.FC = () => {
   };
 
   const fetchWishlist = async () => {
+    setLoading(true);
     try {
       const { data: gigsData } = await api.get("/api/auth/getwishlist");
       setWishlistedGigs(gigsData);
@@ -79,6 +82,8 @@ const Wishlist: React.FC = () => {
     } catch (err) {
       console.error(err);
       showSnackbar("Failed to load wishlist", "error");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -152,6 +157,9 @@ const Wishlist: React.FC = () => {
       <Typography variant="h3" gutterBottom>
         My Wishlist
       </Typography>
+      {loading ? (
+        <GigGridSkeleton count={6} />
+      ) : (
       <Box display="grid" gridTemplateColumns={{ xs: "1fr", sm: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" }} gap={3}>
         {wishlistedGigs.map(gig => {
           const bidStatus = bids.get(gig.id);
@@ -221,6 +229,7 @@ const Wishlist: React.FC = () => {
           );
         })}
       </Box>
+      )}
 
       <Dialog open={bidDialogOpen} onClose={() => setBidDialogOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Place Your Bid</DialogTitle>

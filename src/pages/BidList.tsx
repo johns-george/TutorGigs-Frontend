@@ -19,6 +19,7 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import api, { API_URL } from "@/api";
 import { useNavigate } from "react-router-dom";
+import { BidCardSkeleton } from '../components/LoadingSkeleton';
 
 const BidList: React.FC = () => {
   const [bids, setBids] = useState<any[]>([]);
@@ -127,13 +128,17 @@ const BidList: React.FC = () => {
     }
   };
 
+  const [loading, setLoading] = useState(true);
+
   // ✅ Fetch bids (token auto-handled by interceptor)
   useEffect(() => {
     if (!studentId) return;
+    setLoading(true);
     api
       .get(`/api/auth/bids/student/${studentId}`)
       .then((res) => setBids(res.data))
-      .catch((err) => console.error("Error fetching bids:", err));
+      .catch((err) => console.error("Error fetching bids:", err))
+      .finally(() => setLoading(false));
   }, [studentId]);
 
   // ⬇️ Section rendering logic unchanged
@@ -305,10 +310,18 @@ const BidList: React.FC = () => {
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
       <Typography variant="h3" gutterBottom>My Bids</Typography>
+      {loading ? (
+        <Box>
+          {[...Array(4)].map((_, i) => <BidCardSkeleton key={i} />)}
+        </Box>
+      ) : (
+      <>
       {renderBidSection('Pending', pendingBids, 'warning')}
       {renderBidSection('Accepted', acceptedBids, 'success')}
       {renderBidSection('Rejected', rejectedBids, 'error')}
       {renderBidSection('Completed', completedBids, 'info')}
+      </>
+      )}
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
           <DialogTitle>Confirm End Gig</DialogTitle>
           <DialogContent>

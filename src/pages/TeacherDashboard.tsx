@@ -15,10 +15,12 @@ import { Edit, Save, Cancel, Work, AssignmentTurnedIn } from '@mui/icons-materia
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api, { API_URL } from '@/api'; // 🟢 axios instance with refresh token handling
+import { DashboardSkeleton } from '../components/LoadingSkeleton';
 
 const TeacherDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { user, updateUser } = useAuth();
+  const [loading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>(
@@ -98,6 +100,12 @@ const TeacherDashboard: React.FC = () => {
       fetchRatings();
     }
   }, [user?.username]);
+
+  if (loading) return (
+    <Container maxWidth="md" sx={{ py: 4 }}>
+      <DashboardSkeleton />
+    </Container>
+  );
 
   if (!user) return null;
 

@@ -18,6 +18,7 @@ import { Chat, Check, Close, StopCircle } from '@mui/icons-material';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import api, { API_URL } from '@/api'; // axios instance with token + refresh
+import { BidCardSkeleton } from '../components/LoadingSkeleton';
 
 const Requests: React.FC = () => {
   const { user } = useAuth();
@@ -26,6 +27,7 @@ const Requests: React.FC = () => {
   const [acceptedBids, setAcceptedBids] = useState<any[]>([]);
   const [rejectedBids, setRejectedBids] = useState<any[]>([]);
   const [completedBids, setCompletedBids] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [selectedBid, setSelectedBid] = useState<any>(null);
@@ -45,6 +47,7 @@ const Requests: React.FC = () => {
 
   // Fetch all requests
   const fetchData = async () => {
+    setLoading(true);
     try {
       const { data } = await api.get(`/api/auth/requests/${user?.username}`);
       setPendingBids(data.filter((bid: any) => bid.status === 'PENDING'));
@@ -54,6 +57,8 @@ const Requests: React.FC = () => {
     } catch (err) {
       console.error(err);
       showSnackbar('Failed to fetch requests', 'error');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -194,10 +199,18 @@ const Requests: React.FC = () => {
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Typography variant="h3" gutterBottom>Student Requests</Typography>
 
+      {loading ? (
+        <Box>
+          {[...Array(4)].map((_, i) => <BidCardSkeleton key={i} />)}
+        </Box>
+      ) : (
+      <>
       {renderSection('Pending Requests', pendingBids, 'warning')}
       {renderSection('Accepted Requests', acceptedBids, 'success')}
       {renderSection('Rejected Requests', rejectedBids, 'error')}
       {renderSection('Completed Requests', completedBids, 'info')}
+      </>
+      )}
 
       {/* Confirm End Gig */}
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>

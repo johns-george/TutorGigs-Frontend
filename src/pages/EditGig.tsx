@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { TextField, Button, Container, Typography, Box, Snackbar, Alert } from "@mui/material";
 import { useAuth } from "@/contexts/AuthContext";
 import api from "@/api";
+import { FormSkeleton } from '../components/LoadingSkeleton';
 
 interface Gig {
   id: number;
@@ -56,7 +57,11 @@ const EditGig: React.FC = () => {
     }
   };
 
-  if (loading) return <Typography>Loading...</Typography>;
+  if (loading) return (
+    <Container maxWidth="sm" sx={{ py: 4 }}>
+      <FormSkeleton />
+    </Container>
+  );
   if (!gig) return <Typography>Gig not found</Typography>;
 
   return (

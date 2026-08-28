@@ -12,12 +12,12 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  CircularProgress,
 } from '@mui/material';
 import { Add, Delete, Edit } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import api from '@/api'; // axios instance with token + refresh
+import api from '@/api';
+import { GigGridSkeleton } from '../components/LoadingSkeleton';
 
 interface Gig {
   acceptedStudentNames: string[];
@@ -71,7 +71,14 @@ const MyGigs: React.FC = () => {
     }
   };
 
-  if (loading) return <CircularProgress sx={{ display: 'block', mx: 'auto', mt: 6 }} />;
+  if (loading) return (
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+        <Typography variant="h3">My Gigs</Typography>
+      </Box>
+      <GigGridSkeleton count={6} />
+    </Container>
+  );
 
   if (gigs.length === 0) {
     return (
