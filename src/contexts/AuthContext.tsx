@@ -56,8 +56,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(userData);
   };
 
-  // Logout
-  const logout = () => {
+  // Logout — blacklists both tokens on the server, then clears local state
+  const logout = async () => {
+    const currentAccess = accessToken ?? getAccessToken();
+    const currentRefresh = refreshToken ?? getRefreshToken();
+
+    try {
+      await api.post("/api/auth/logout", {
+        accessToken: currentAccess,
+        refreshToken: currentRefresh,
+      });
+    } catch {
+      // Best-effort: even if the server call fails, clear local state
+    }
+
     clearAuth();
     setAccessToken(null);
     setRefreshToken(null);

@@ -21,7 +21,7 @@ const StudentDashboard: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>(
-    `${API_URL}${user.profileImageUrl}?t=${new Date().getTime()}` || ''
+    `${API_URL}${user.profileImageUrl}` || ''
   );
 
   const grade = user?.grade || '';
@@ -55,7 +55,7 @@ const StudentDashboard: React.FC = () => {
 
         const newUser = { ...updatedUser, profileImageUrl: uploadData.profileImageUrl };
         updateUser(newUser);
-        setPreviewUrl(`${API_URL}${uploadData.profileImageUrl}?t=${new Date().getTime()}`);
+        setPreviewUrl(`${API_URL}${uploadData.profileImageUrl}`);
         setSelectedImage(null);
       }
 

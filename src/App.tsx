@@ -1,12 +1,12 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Box } from '@mui/material';
 // Contexts
 import { AuthProvider } from './contexts/AuthContext';
 import { CustomThemeProvider } from './contexts/ThemeContext';
 
 // Components
+import ErrorBoundary from './components/ErrorBoundary';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -30,13 +30,11 @@ import NotFound from './pages/NotFound';
 import EditGig from './pages/EditGig';
 import GroupChat from './pages/GroupChat';
 import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/RestPassword'
+import ResetPassword from './pages/ResetPassword'
 import ForgotUsername from './pages/ForgotUsername';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import HelpCenter from './pages/HelpCenter';
-
-const queryClient = new QueryClient();
 
 // 🔹 Layout wrapper that hides Navbar/Footer on login/signup
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -62,10 +60,10 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
 const App: React.FC = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <CustomThemeProvider>
-        <AuthProvider>
-          <BrowserRouter>
+    <ErrorBoundary>
+    <CustomThemeProvider>
+      <AuthProvider>
+        <BrowserRouter>
             <Layout>
               <Routes>
                 {/* Public Routes */}
@@ -162,7 +160,7 @@ const App: React.FC = () => {
           </BrowserRouter>
         </AuthProvider>
       </CustomThemeProvider>
-    </QueryClientProvider>
+    </ErrorBoundary>
   );
 };
 

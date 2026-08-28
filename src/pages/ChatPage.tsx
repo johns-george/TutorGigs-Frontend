@@ -136,7 +136,7 @@ const ChatPage: React.FC = () => {
         {receiver && (
           <>
             <Avatar
-              src={`${API_URL}${receiver.profileImageUrl}?t=${new Date().getTime()}`}
+              src={`${API_URL}${receiver.profileImageUrl}`}
               sx={{ width: 60, height: 60, fontSize: '2rem' }}
             >
               {receiver?.fullName?.charAt(0)}
@@ -157,8 +157,8 @@ const ChatPage: React.FC = () => {
         {receiver && messages.map((msg, idx) => {
           const isMine = msg.senderId === user?.id;
           const avatarSrc = isMine
-            ? user?.profileImageUrl && `${API_URL}${user.profileImageUrl}?t=${new Date().getTime()}`
-            : receiver?.profileImageUrl && `${API_URL}${receiver.profileImageUrl}?t=${new Date().getTime()}`;
+            ? user?.profileImageUrl && `${API_URL}${user.profileImageUrl}`
+            : receiver?.profileImageUrl && `${API_URL}${receiver.profileImageUrl}`;
           const avatarLetter = isMine
             ? user?.fullName?.charAt(0).toUpperCase() || "?"
             : receiver?.fullName?.charAt(0).toUpperCase() || "?";

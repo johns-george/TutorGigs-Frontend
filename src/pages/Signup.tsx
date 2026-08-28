@@ -153,7 +153,6 @@ const handleSubmit = async (e: React.FormEvent) => {
     login(accessToken, refreshToken,user);
 
     // Redirect based on role
-    //console.log(savedUser);
     const redirectPath = user.role === 'STUDENT' ? '/explorer' : '/my-gigs';
     navigate(redirectPath, { replace: true });
 

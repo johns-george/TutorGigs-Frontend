@@ -72,7 +72,7 @@ const TeacherDetails: React.FC = () => {
             <Avatar
               src={
                 teacher?.profileImageUrl
-                  ? `${API_URL}${teacher.profileImageUrl}?t=${new Date().getTime()}`
+                  ? `${API_URL}${teacher.profileImageUrl}`
                   : undefined
               }
               sx={{ width: 80, height: 80, fontSize: '2rem' }}
@@ -99,8 +99,6 @@ const TeacherDetails: React.FC = () => {
           </Box>
 
           <Box mt={3} display="flex" flexDirection="column" gap={1.5}>
-            <Typography><strong>Email:</strong> {teacher?.email || 'NA'}</Typography>
-            <Typography><strong>Mobile:</strong> {teacher?.mobile || 'NA'}</Typography>
             <Typography>
               <strong>Subjects:</strong>{' '}
               {Array.isArray(teacher?.subjects)

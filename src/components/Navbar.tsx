@@ -71,8 +71,6 @@ const Navbar: React.FC = () => {
   };
 
   const handleNavigation = (path: string) => {
-    console.log("Navbar user:", user);
-      console.log("Navigating to:", path);
     navigate(path);
     setMobileMenuOpen(false);
   };
@@ -207,7 +205,7 @@ const Navbar: React.FC = () => {
                       }}
                     >
                        <Avatar
-                   src={`${API_URL}${user.profileImageUrl}?t=${new Date().getTime()}`}
+                   src={`${API_URL}${user.profileImageUrl}`}
                     sx={{ width: 80, height: 80, fontSize: '2rem' }}>
                      {user?.fullName?.charAt(0).toUpperCase()}
                       </Avatar>
@@ -286,7 +284,7 @@ const Navbar: React.FC = () => {
                     }}
                   >
                    <Avatar
-                   src={`${API_URL}${user.profileImageUrl}?t=${new Date().getTime()}`}
+                   src={`${API_URL}${user.profileImageUrl}`}
                     sx={{ width: 80, height: 80, fontSize: '2rem' }}>
                      {user?.fullName?.charAt(0).toUpperCase()}
                       </Avatar>

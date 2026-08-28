@@ -133,7 +133,7 @@ const Requests: React.FC = () => {
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Box display="flex" alignItems="center" gap={2}>
             <Avatar
-              src={bid?.studentProfileImageUrl ? `${API_URL}${bid.studentProfileImageUrl}?t=${Date.now()}` : undefined}
+              src={bid?.studentProfileImageUrl ? `${API_URL}${bid.studentProfileImageUrl}` : undefined}
               sx={{ width: 80, height: 80, fontSize: '2rem' }}
             >
               {bid?.studentFullName?.charAt(0).toUpperCase() || '?'}

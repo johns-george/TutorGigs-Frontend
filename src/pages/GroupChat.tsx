@@ -227,7 +227,7 @@ const GroupChat: React.FC = () => {
 
       {/* Send Message */}
       <Box display="flex" alignItems="center" gap={1}>
-        <TextField fullWidth placeholder="Type a message..." value={message} onChange={(e) => setMessage(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && sendMessage()} />
+        <TextField fullWidth placeholder="Type a message..." value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && sendMessage()} />
         <IconButton color="primary" onClick={sendMessage}><Send /></IconButton>
       </Box>
 

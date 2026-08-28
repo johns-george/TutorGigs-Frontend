@@ -22,7 +22,7 @@ const TeacherDashboard: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>(
-    user?.profileImageUrl ? `${API_URL}${user.profileImageUrl}?t=${new Date().getTime()}` : ''
+    user?.profileImageUrl ? `${API_URL}${user.profileImageUrl}` : ''
   );
   const [avgRating, setAvgRating] = useState<number | null>(null);
   const [ratings, setRatings] = useState<any[]>([]);
@@ -83,7 +83,7 @@ const TeacherDashboard: React.FC = () => {
         const newUser = { ...updatedUser, profileImageUrl: uploadData.profileImageUrl };
         updateUser(newUser);
         setSelectedImage(null);
-        setPreviewUrl(`${API_URL}${uploadData.profileImageUrl}?t=${new Date().getTime()}`);
+        setPreviewUrl(`${API_URL}${uploadData.profileImageUrl}`);
       }
 
       setIsEditing(false);

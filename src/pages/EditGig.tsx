@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { TextField, Button, Container, Typography, Box } from "@mui/material";
+import { TextField, Button, Container, Typography, Box, Snackbar, Alert } from "@mui/material";
 import { useAuth } from "@/contexts/AuthContext";
-import api from "@/api"; // Axios instance with JWT interceptor
+import api from "@/api";
 
 interface Gig {
   id: number;
@@ -20,18 +20,18 @@ const EditGig: React.FC = () => {
   const { user } = useAuth();
   const [gig, setGig] = useState<Gig | null>(null);
   const [loading, setLoading] = useState(true);
+  const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: "success" | "error" }>({
+    open: false, message: "", severity: "error",
+  });
   const gigId = Number(id);
 
-  // Fetch gig details by ID
   useEffect(() => {
     const fetchGig = async () => {
       try {
         const { data } = await api.get(`/api/auth/gigs/${gigId}`);
-        console.log("Fetched gig:", data);
         setGig(data);
       } catch (error: any) {
-        console.error("Error fetching gig:", error);
-        alert(error?.response?.data?.message || "Failed to fetch gig");
+        setSnackbar({ open: true, message: error?.response?.data?.message || "Failed to fetch gig", severity: "error" });
       } finally {
         setLoading(false);
       }
@@ -49,12 +49,10 @@ const EditGig: React.FC = () => {
     if (!gig) return;
 
     try {
-      const { data } = await api.put(`/api/auth/edit-gigs/${gigId}`, gig);
-      console.log("Updated gig:", data);
+      await api.put(`/api/auth/edit-gigs/${gigId}`, gig);
       navigate("/my-gigs");
     } catch (error: any) {
-      console.error("Error updating gig:", error);
-      alert(error?.response?.data?.message || "Failed to update gig");
+      setSnackbar({ open: true, message: error?.response?.data?.message || "Failed to update gig", severity: "error" });
     }
   };
 
@@ -67,62 +65,25 @@ const EditGig: React.FC = () => {
         Edit Gig
       </Typography>
       <Box component="form" onSubmit={handleSubmit}>
-        <TextField
-          label="Subject"
-          name="subject"
-          value={gig.subject}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-        />
-        <TextField
-          label="Amount"
-          name="amount"
-          type="number"
-          value={gig.amount}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-        />
-        <TextField
-          label="Grade"
-          name="grade"
-          value={gig.grade}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-        />
-        <TextField
-          label="Syllabus"
-          name="syllabus"
-          value={gig.syllabus}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-        />
-        <TextField
-          label="Description"
-          name="description"
-          value={gig.description}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-          multiline
-          rows={3}
-        />
+        <TextField label="Subject" name="subject" value={gig.subject} onChange={handleChange} fullWidth margin="normal" />
+        <TextField label="Amount" name="amount" type="number" value={gig.amount} onChange={handleChange} fullWidth margin="normal" />
+        <TextField label="Grade" name="grade" value={gig.grade} onChange={handleChange} fullWidth margin="normal" />
+        <TextField label="Syllabus" name="syllabus" value={gig.syllabus} onChange={handleChange} fullWidth margin="normal" />
+        <TextField label="Description" name="description" value={gig.description} onChange={handleChange} fullWidth margin="normal" multiline rows={3} />
 
         <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
           Save Changes
         </Button>
-        <Button
-          variant="outlined"
-          color="secondary"
-          sx={{ mt: 2, ml: 2 }}
-          onClick={() => navigate("/my-gigs")}
-        >
+        <Button variant="outlined" color="secondary" sx={{ mt: 2, ml: 2 }} onClick={() => navigate("/my-gigs")}>
           Cancel
         </Button>
       </Box>
+
+      <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={() => setSnackbar({ ...snackbar, open: false })} anchorOrigin={{ vertical: "top", horizontal: "center" }}>
+        <Alert severity={snackbar.severity} sx={{ width: "100%" }} variant="filled" onClose={() => setSnackbar({ ...snackbar, open: false })}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };

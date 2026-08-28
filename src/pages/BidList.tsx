@@ -199,7 +199,7 @@ const BidList: React.FC = () => {
                 <Avatar
                   src={
                     bid.teacherProfileImageurl
-                      ? `${API_URL}${bid.teacherProfileImageurl}?t=${new Date().getTime()}`
+                      ? `${API_URL}${bid.teacherProfileImageurl}`
                       : undefined
                   }
                   sx={{

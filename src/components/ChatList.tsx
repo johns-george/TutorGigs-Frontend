@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import {
   Drawer, Box, Typography, List, ListItem, ListItemAvatar, ListItemText, Avatar,
   Badge, IconButton, Divider, Chip, useTheme, Dialog, DialogTitle,
-  DialogContent, DialogActions, TextField, Button, Checkbox, ListItemButton
+  DialogContent, DialogActions, TextField, Button, Checkbox, ListItemButton,
+  Snackbar, Alert
 } from '@mui/material';
 import { Close, Chat } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
@@ -27,7 +28,6 @@ const ChatList: React.FC<ChatListProps> = ({ open, onClose }) => {
       if (!open || !userid) return;
       try {
         const { data } = await api.get(`/api/chat/getchatlist/${userid}`);
-        console.log("Fetched chats:", data);
         setChats(data);
       } catch (err) {
         console.error("Error fetching chats:", err);
@@ -101,7 +101,7 @@ const ChatList: React.FC<ChatListProps> = ({ open, onClose }) => {
                       <Badge badgeContent={chat.unreadCount} color="error" invisible={chat.unreadCount === 0}>
                         <Avatar sx={{ bgcolor: 'primary.main', width: 48, height: 48 }}>
                           <Avatar
-                            src={`${API_URL}${otherParticipant.profileImageUrl}?t=${new Date().getTime()}`}
+                            src={`${API_URL}${otherParticipant.profileImageUrl}`}
                             sx={{ width: 60, height: 60, fontSize: '2rem' }}
                           >
                             {otherParticipant?.fullName?.charAt(0)}
@@ -180,6 +180,7 @@ const GroupWindow: React.FC<GroupWindowProps> = ({ open, onClose, chats }) => {
   const [groupName, setGroupName] = useState("");
   const [members, setMembers] = useState<any[]>([]);
   const [selected, setSelected] = useState<number[]>([]);
+  const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: "success" | "error" }>({ open: false, message: "", severity: "error" });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -195,7 +196,7 @@ const GroupWindow: React.FC<GroupWindowProps> = ({ open, onClose, chats }) => {
 
   const handleCreate = async () => {
     if (!groupName || selected.length === 0) {
-      alert("Please enter a group name and select members.");
+      setSnackbar({ open: true, message: "Please enter a group name and select members.", severity: "error" });
       return;
     }
 
@@ -207,13 +208,14 @@ const GroupWindow: React.FC<GroupWindowProps> = ({ open, onClose, chats }) => {
       });
       navigate(`/chat/create-group/${data.id}`);
       onClose();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Error creating group");
+      setSnackbar({ open: true, message: err?.response?.data?.message || "Error creating group", severity: "error" });
     }
   };
 
   return (
+    <>
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle>Create Group Chat</DialogTitle>
       <DialogContent>
@@ -233,8 +235,14 @@ const GroupWindow: React.FC<GroupWindowProps> = ({ open, onClose, chats }) => {
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
         <Button variant="contained" onClick={handleCreate}>Create</Button>
-      </DialogActions>
-    </Dialog>
+      </DialogActions>      </Dialog>
+
+      <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={() => setSnackbar({ ...snackbar, open: false })} anchorOrigin={{ vertical: "top", horizontal: "center" }}>
+        <Alert severity={snackbar.severity} sx={{ width: "100%" }} variant="filled" onClose={() => setSnackbar({ ...snackbar, open: false })}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </>
   );
 };
 

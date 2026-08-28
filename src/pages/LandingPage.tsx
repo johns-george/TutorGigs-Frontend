@@ -152,7 +152,7 @@ const LandingPage: React.FC = () => {
               <Typography variant="h3" component="div" fontWeight="bold" color="primary">
                 {stat.number}
               </Typography>
-              <Typography variant="body1" color={theme.palette.mode==='light'?"seccondary.main":"warning.main"}>
+              <Typography variant="body1" color={theme.palette.mode==='light'?"secondary.main":"warning.main"}>
                 {stat.label}
               </Typography>
             </Box>
@@ -187,7 +187,7 @@ const LandingPage: React.FC = () => {
                 <Typography variant="h5" component="h3" gutterBottom>
                   Expert Tutors
                 </Typography>
-                <Typography variant="body1" color={theme.palette.mode==='light'?"seccondary.main":"warning.main"}>
+                <Typography variant="body1" color={theme.palette.mode==='light'?"secondary.main":"warning.main"}>
                   Learn from qualified educators with proven track records and passion for teaching.
                 </Typography>
               </CardContent>
@@ -199,7 +199,7 @@ const LandingPage: React.FC = () => {
                 <Typography variant="h5" component="h3" gutterBottom>
                   Personalized Learning
                 </Typography>
-                <Typography variant="body1" color={theme.palette.mode==='light'?"seccondary.main":"warning.main"}>
+                <Typography variant="body1" color={theme.palette.mode==='light'?"secondary.main":"warning.main"}>
                   Get one-on-one attention tailored to your learning style and academic goals.
                 </Typography>
               </CardContent>
@@ -211,7 +211,7 @@ const LandingPage: React.FC = () => {
                 <Typography variant="h5" component="h3" gutterBottom>
                   Proven Results
                 </Typography>
-                <Typography variant="body1" color={theme.palette.mode==='light'?"seccondary.main":"warning.main"}>
+                <Typography variant="body1" color={theme.palette.mode==='light'?"secondary.main":"warning.main"}>
                   Join thousands of students who have achieved their academic goals with our platform.
                 </Typography>
               </CardContent>
