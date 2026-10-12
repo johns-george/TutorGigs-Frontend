@@ -1,73 +1,56 @@
-# Welcome to your Lovable project
+# TutorGigs Frontend
 
-## Project info
+React + TypeScript single-page app for **TutorGigs**, a tutoring marketplace where tutors publish gigs and students bid, chat and manage bookings.
 
-**URL**: https://lovable.dev/projects/90bea6a0-9361-4112-8134-017d509e65ec
+- **Live app:** https://final-tutor-app-frontend.onrender.com/
+- **Backend repo:** https://github.com/johns-george/TutorGigs-Backend
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+- Role-based experiences: separate **student** and **teacher** dashboards with protected routes
+- Gig explorer, gig creation/editing, bidding and bid management, wishlist
+- **Real-time 1:1 and group chat** (STOMP over SockJS WebSocket)
+- Sign-up, login, forgot-password / reset-password and forgot-username flows
+- Light/dark theme, loading skeletons and an error boundary
 
-**Use Lovable**
+## Tech stack
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/90bea6a0-9361-4112-8134-017d509e65ec) and start prompting.
+React 18 · TypeScript · Vite · React Router · Tailwind CSS · shadcn/ui · Axios · STOMP.js + SockJS · Docker + NGINX
 
-Changes made via Lovable will be committed automatically to this repo.
+## Project structure
 
-**Use your preferred IDE**
+```
+src/
+├── pages/          route-level screens (Explorer, MyGigs, ChatPage, dashboards, auth flows...)
+├── components/     shared UI (Navbar, ChatList, ProtectedRoute, ErrorBoundary...)
+├── contexts/       AuthContext, ThemeContext
+├── api.ts          Axios client (base URL from VITE_API_URL)
+└── tokenUtils.tsx  token handling
+```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Run locally
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+npm install
+echo "VITE_API_URL=http://localhost:8080" > .env.local
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The app runs at http://localhost:5173. You need the [backend](https://github.com/johns-george/TutorGigs-Backend) running (or point `VITE_API_URL` at the hosted API).
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Production build with Docker
 
-**Use GitHub Codespaces**
+The image builds the Vite app and serves it from **NGINX** with SPA fallback routing. The API URL is injected at container start, so one image works in any environment:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```bash
+docker build -t tutorgigs-frontend .
+docker run -p 8080:80 -e VITE_API_URL=https://your-api.example.com tutorgigs-frontend
+```
 
-## What technologies are used for this project?
+## CI
 
-This project is built with:
+GitHub Actions (`.github/workflows/ci.yml`) installs dependencies and builds the app on every push and pull request.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Author
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/90bea6a0-9361-4112-8134-017d509e65ec) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Johns George · [LinkedIn](https://www.linkedin.com/in/johns-george-3568b8233/) · [GitHub](https://github.com/johns-george)
