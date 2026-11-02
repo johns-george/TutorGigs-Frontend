@@ -23,10 +23,9 @@ import {
 } from '@mui/material';
 import { Send, ArrowBack, Add, Delete } from '@mui/icons-material';
 import { useNavigate, useParams } from 'react-router-dom';
-import SockJS from 'sockjs-client';
-import { Client } from '@stomp/stompjs';
 import { useAuth } from '@/contexts/AuthContext';
-import api, { API_URL } from '@/api'; // centralized axios instance
+import api from '@/api';
+import { useChatSocket } from '@/hooks/useChatSocket';
 
 type Message = {
   id?: number;
@@ -35,12 +34,13 @@ type Message = {
   senderName: string;
   content: string;
   sentAt?: string;
+  sequenceNumber?: number;
 };
 
 const GroupChat: React.FC = () => {
   const navigate = useNavigate();
   const { groupchatId } = useParams<{ groupchatId: string }>();
-  const { user, accessToken } = useAuth();
+  const { user } = useAuth();
   const groupChatId = Number(groupchatId);
 
   const [chat, setChat] = useState<any>(null);
@@ -57,7 +57,6 @@ const GroupChat: React.FC = () => {
   });
 
   const messagesRef = useRef<HTMLDivElement | null>(null);
-  const stompClientRef = useRef<Client | null>(null);
 
   const linkifyOptions = { target: '_blank', rel: 'noopener noreferrer', className: 'text-blue-500 underline hover:text-blue-700' };
   const mySenderId = user?.id;
@@ -132,32 +131,87 @@ const GroupChat: React.FC = () => {
     }
   };
 
-  // -------------------- WebSocket --------------------
-  useEffect(() => {
-    const socket = new SockJS(`${API_URL}/ws`);
-    const client = new Client({
-      webSocketFactory: () => socket as any,
-      debug: () => {},
-      reconnectDelay: 5000,
-      onConnect: () => {
-        client.subscribe(`/topic/chat/${groupChatId}`, (msg) => {
-          if (msg.body) {
-            const payload: Message = JSON.parse(msg.body);
-            setMessages((prev) => [...prev, payload]);
-          }
+  const fetchMissingMessages = async (afterSeq: number) => {
+    try {
+      const { data } = await api.get(`/api/chat/${groupChatId}/messages?afterSeq=${afterSeq}`);
+      if (Array.isArray(data) && data.length > 0) {
+        setMessages((prev) => {
+          const map = new Map<string | number, Message>();
+          prev.forEach((m) => {
+            const key = m.sequenceNumber != null ? `seq-${m.sequenceNumber}` : `id-${m.id}`;
+            map.set(key, m);
+          });
+          data.forEach((m: any) => {
+            const normalized: Message = {
+              id: m.id,
+              groupChatId: m.chatId || groupChatId,
+              senderId: String(m.senderId ?? ''),
+              senderName: String(m.senderName ?? ''),
+              content: String(m.content ?? ''),
+              sentAt: m.sentAt,
+              sequenceNumber: m.sequenceNumber,
+            };
+            const key = normalized.sequenceNumber != null ? `seq-${normalized.sequenceNumber}` : `id-${normalized.id}`;
+            map.set(key, normalized);
+          });
+          return Array.from(map.values()).sort((a, b) => {
+            if (a.sequenceNumber != null && b.sequenceNumber != null) {
+              return a.sequenceNumber - b.sequenceNumber;
+            }
+            return (a.id || 0) - (b.id || 0);
+          });
         });
-      },
-      onStompError: (frame) => console.error('STOMP error:', frame.headers['message'], frame.body),
-    });
+      }
+    } catch (err: any) {
+      console.error('Failed to fetch missing messages in group chat', err);
+    }
+  };
 
-    stompClientRef.current = client;
-    client.activate();
+  const { sendChatMessage } = useChatSocket({
+    chatId: groupChatId,
+    onMessage: (payload) => {
+      setMessages((prev) => {
+        const incomingSeq = payload.sequenceNumber;
+        let lastSeq = 0;
+        for (const m of prev) {
+          if (m.sequenceNumber && m.sequenceNumber > lastSeq) {
+            lastSeq = m.sequenceNumber;
+          }
+        }
 
-    return () => {
-      stompClientRef.current?.deactivate();
-      stompClientRef.current = null;
-    };
-  }, [groupChatId]);
+        const normalized: Message = {
+          id: payload.id as number | undefined,
+          groupChatId: (payload.chatId as number) || groupChatId,
+          senderId: String(payload.senderId ?? ''),
+          senderName: String(payload.senderName ?? ''),
+          content: String(payload.content ?? ''),
+          sentAt: payload.sentAt as string | undefined,
+          sequenceNumber: payload.sequenceNumber,
+        };
+
+        if (!incomingSeq || prev.length === 0 || lastSeq === 0) {
+          if (payload.id && prev.some((m) => m.id === payload.id)) return prev;
+          if (incomingSeq && prev.some((m) => m.sequenceNumber === incomingSeq)) return prev;
+          return [...prev, normalized];
+        }
+
+        if (incomingSeq <= lastSeq) {
+          return prev;
+        }
+
+        if (incomingSeq === lastSeq + 1) {
+          return [...prev, normalized];
+        }
+
+        // Gap detected: e.g. lastSeq = 10, incomingSeq = 14
+        fetchMissingMessages(lastSeq);
+
+        return [...prev, normalized].sort(
+          (a, b) => (a.sequenceNumber || 0) - (b.sequenceNumber || 0)
+        );
+      });
+    },
+  });
 
   const scrollToBottom = () => {
     setTimeout(() => {
@@ -166,9 +220,13 @@ const GroupChat: React.FC = () => {
   };
 
   const sendMessage = () => {
-    if (!message.trim() || !stompClientRef.current?.active) return;
-    stompClientRef.current.publish({ destination: '/app/chat.sendMessage', body: JSON.stringify({ chatId: groupChatId, senderId: mySenderId, content: message.trim() }) });
-    setMessage('');
+    if (!message.trim()) return;
+    const sent = sendChatMessage({
+      chatId: groupChatId,
+      senderId: mySenderId,
+      content: message.trim(),
+    });
+    if (sent) setMessage('');
   };
 
   useEffect(() => {

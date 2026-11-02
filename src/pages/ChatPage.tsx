@@ -3,10 +3,9 @@ import Linkify from 'linkify-react';
 import { Box, Container, Typography, TextField, IconButton, Avatar, Paper } from '@mui/material';
 import { Send, ArrowBack } from '@mui/icons-material';
 import { useNavigate, useParams } from 'react-router-dom';
-import SockJS from "sockjs-client";
-import { Client } from "@stomp/stompjs";
 import { useAuth } from '@/contexts/AuthContext';
-import api, { API_URL } from '@/api'; // Axios instance
+import api, { API_URL } from '@/api';
+import { useChatSocket } from '@/hooks/useChatSocket';
 
 type Message = {
   id?: number;
@@ -14,6 +13,7 @@ type Message = {
   senderId: string;
   content: string;
   sentAt?: string;
+  sequenceNumber?: number;
 };
 
 const ChatPage: React.FC = () => {
@@ -24,12 +24,73 @@ const ChatPage: React.FC = () => {
 
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
-  const [connected, setConnected] = useState(false);
-  const [chatDetails, setChatDetails] = useState<any | null>(null);
   const [receiver, setReceiver] = useState<any | null>(null);
 
-  const stompClientRef = useRef<Client | null>(null);
   const messagesRef = useRef<HTMLDivElement | null>(null);
+
+  const fetchMissingMessages = async (afterSeq: number) => {
+    try {
+      const { data } = await api.get(`/api/chat/${chatId}/messages?afterSeq=${afterSeq}`);
+      if (Array.isArray(data) && data.length > 0) {
+        setMessages((prev) => {
+          const map = new Map<string | number, Message>();
+          prev.forEach((m) => {
+            const key = m.sequenceNumber != null ? `seq-${m.sequenceNumber}` : `id-${m.id}`;
+            map.set(key, m);
+          });
+          data.forEach((m: Message) => {
+            const key = m.sequenceNumber != null ? `seq-${m.sequenceNumber}` : `id-${m.id}`;
+            map.set(key, m);
+          });
+          return Array.from(map.values()).sort((a, b) => {
+            if (a.sequenceNumber != null && b.sequenceNumber != null) {
+              return a.sequenceNumber - b.sequenceNumber;
+            }
+            return (a.id || 0) - (b.id || 0);
+          });
+        });
+      }
+    } catch (err) {
+      console.error("Failed to fetch missing messages", err);
+    }
+  };
+
+  const { connected, sendChatMessage } = useChatSocket({
+    chatId,
+    onMessage: (payload) => {
+      setMessages((prev) => {
+        const incomingSeq = payload.sequenceNumber;
+        let lastSeq = 0;
+        for (const m of prev) {
+          if (m.sequenceNumber && m.sequenceNumber > lastSeq) {
+            lastSeq = m.sequenceNumber;
+          }
+        }
+
+        if (!incomingSeq || prev.length === 0 || lastSeq === 0) {
+          if (payload.id && prev.some((m) => m.id === payload.id)) return prev;
+          if (incomingSeq && prev.some((m) => m.sequenceNumber === incomingSeq)) return prev;
+          return [...prev, payload as Message];
+        }
+
+        if (incomingSeq <= lastSeq) {
+          return prev;
+        }
+
+        if (incomingSeq === lastSeq + 1) {
+          return [...prev, payload as Message];
+        }
+
+        // Gap detected: e.g. lastSeq = 10, incomingSeq = 14
+        // Automatically fetch missing messages from DB
+        fetchMissingMessages(lastSeq);
+
+        return [...prev, payload as Message].sort(
+          (a, b) => (a.sequenceNumber || 0) - (b.sequenceNumber || 0)
+        );
+      });
+    },
+  });
 
   const linkifyOptions = {
     target: '_blank',
@@ -44,7 +105,6 @@ const ChatPage: React.FC = () => {
     const fetchChatDetails = async () => {
       try {
         const { data } = await api.get(`/api/chat/${chatId}`);
-        setChatDetails(data);
 
         const other = data.participants.find((p: any) => p.userId !== user?.id);
         setReceiver(other);
@@ -72,37 +132,6 @@ const ChatPage: React.FC = () => {
     fetchChatHistory();
   }, [chatId]);
 
-  // ✅ WebSocket connection
-  useEffect(() => {
-    if (!chatId) return;
-    const socket = new SockJS(`${API_URL}/ws`);
-    const client = new Client({
-      webSocketFactory: () => socket as any,
-      debug: () => {},
-      onConnect: () => {
-        setConnected(true);
-        client.subscribe(`/topic/chat/${chatId}`, (msg) => {
-          if (msg.body) {
-            const payload: Message = JSON.parse(msg.body);
-            setMessages(prev => [...prev, payload]);
-          }
-        });
-      },
-      onStompError: (frame) => {
-        console.error("Broker error:", frame.headers["message"], frame.body);
-      },
-      reconnectDelay: 5000,
-    });
-
-    stompClientRef.current = client;
-    client.activate();
-
-    return () => {
-      client.deactivate();
-      setConnected(false);
-    };
-  }, [chatId]);
-
   // ✅ Scroll to bottom on new message
   useEffect(() => {
     if (messagesRef.current) {
@@ -112,20 +141,13 @@ const ChatPage: React.FC = () => {
 
   // ✅ Send message
   const sendMessage = () => {
-    if (!message.trim() || !stompClientRef.current?.active) return;
-
-    const dto = {
+    if (!message.trim()) return;
+    const sent = sendChatMessage({
       chatId,
       senderId: user?.id,
-      content: message.trim()
-    };
-
-    stompClientRef.current.publish({
-      destination: "/app/chat.sendMessage",
-      body: JSON.stringify(dto),
+      content: message.trim(),
     });
-
-    setMessage("");
+    if (sent) setMessage("");
   };
 
   return (
